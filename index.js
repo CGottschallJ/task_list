@@ -1,263 +1,377 @@
+const mainContainer = document.querySelector('#container');
+
+/* HEADER SECTION */
+
+//Creating Header Container
+const headerContainer = document.createElement('div');
+headerContainer.id = 'header-container';
+headerContainer.className = 'nav-wrapper';
+//Appending to mainContainer
+mainContainer.appendChild(headerContainer);
+
+//Creating Header Text
+const headerText = document.createElement('h1');
+headerText.id = 'header-text';
+headerContainer.className = 'brand-logo';
+headerText.innerText = 'Task List Application';
+//Appending To HeaderContainer
+headerContainer.appendChild(headerText);
+
+/* CREATE LIST SECTION */
+
+//Creating subheader for createList and filter section
+const subheader = document.createElement('div')
+subheader.id = 'subheader';
+mainContainer.appendChild(subheader);
+
+//Creating Add List Button Container
+const addListContainer = document.createElement('form');
+addListContainer.id = 'add-list-container';
+addListContainer.className = 'input-field col s6'
+//Appending to mainContainer
+subheader.appendChild(addListContainer);
+
+//Creating New List Input
+const newListInput = document.createElement('input');
+newListInput.id = 'new-list-input';
+newListInput.className = 'validate';
+newListInput.setAttribute('type', 'text');
+//Appending to addListContainer
+addListContainer.appendChild(newListInput);
+
+//Creating Label for New List label
+const newListLabel = document.createElement('label');
+newListLabel.setAttribute('for', 'new-list-input');
+newListLabel.innerText = 'New List...';
+//Append to newListContainer
+addListContainer.appendChild(newListLabel);
+
+//Creating Add List Button
+const addListButton = document.createElement('input');
+addListButton.className = "btn";
+addListButton.id = 'create-list-button';
+addListButton.setAttribute('type', 'submit');
+addListButton.setAttribute('value', 'Add New List');
+//Appending to add-list-button-container
+addListContainer.appendChild(addListButton);
+
+//creating filterListsContainer
+const filterListsContainer = document.createElement('div');
+filterListsContainer.className = 'input-field col s12';
+subheader.appendChild(filterListsContainer);
+
+//creating filterListsInput
+const filterListInput = document.createElement('input');
+filterListInput.id = 'filter-list-input';
+filterListInput.setAttribute('type', 'text');
+//Appending to addListContainer
+filterListsContainer.appendChild(filterListInput);
+
+//Creating filterListLabel
+const filterListLabel = document.createElement('label');
+filterListLabel.setAttribute('for', 'filter-list-input');
+filterListLabel.innerText = 'Search Lists...';
+//Append to newListContainer
+filterListsContainer.appendChild(filterListLabel);
+
+//Creating ListDisplayContainer
+const listDisplayContainer = document.createElement('div');
+listDisplayContainer.id = "list-display-container";
+listDisplayContainer.style.display ='grid';
+listDisplayContainer.style.gridTemplateColumns = 'repeat(1, 1fr 1fr)';
+listDisplayContainer.style.gridGap ='10px';
 
 
+//Appending to add-list-button-container
+mainContainer.appendChild(listDisplayContainer);
 
-const createListContainer = document.querySelector('#listCreateWrap');
+loadEventListeners();
 
-// - Creating a button to open createListForm
-const openCreateFormButton = document.createElement('a');
-openCreateFormButton.id = "createListButton"; 
-openCreateFormButton.className= "waves-effect waves-light btn green";
-openCreateFormButton.innerText = 'Create New List';
-createListContainer.appendChild(openCreateFormButton);
+function loadEventListeners() {
 
-// - Creating createListForm
-const createListForm = document.createElement('form');
-createListForm.id = 'createListForm';
+  addListContainer.addEventListener('submit', createNewList);
 
-// - Creating listNameInput
-const listNameInput = document.createElement('input');
-listNameInput.setAttribute('placeholder', 'Enter New List Name');
-listNameInput.setAttribute('type', 'text');
-listNameInput.className = "validate";
-listNameInput.id = "listNameInput";
+  filterListInput.addEventListener('keyup', filterListNames);
 
-// - Appending listNameInput to createListForm
-createListForm.appendChild(listNameInput);
+  listDisplayContainer.addEventListener('click', filterTaskList);
 
-// - Creating createListSubmit button
-const createListSubmit = document.createElement('a');
-createListSubmit.className = "waves-effect waves-light btn right green";
-createListSubmit.innerText = "Create List";
-createListSubmit.style.margin = '0px 10px';
-createListSubmit.style.color = 'white';
+  listDisplayContainer.addEventListener('click', removeList);
 
-// - Appending createListSubmit to createListForm
-createListForm.appendChild(createListSubmit);
+  listDisplayContainer.addEventListener('click', displayAddTaskInput);
 
-// - Creating Nevermind Button
-const nevermindButton = document.createElement('a');
-nevermindButton.id = 'nevermindButton'
-nevermindButton.className = "waves-effect waves-light btn red right";
-nevermindButton.innerText = "Nevermind";
+  listDisplayContainer.addEventListener('submit', addTaskToList);
 
-// - Appending Nevermind to createListForm
-createListForm.appendChild(nevermindButton);
+  listDisplayContainer.addEventListener('keyup', filterTaskNames);
 
+  listDisplayContainer.addEventListener('click', removeTask);
 
-// openCreateFormButton Functionality
-openCreateFormButton.addEventListener('click', e => {
+}
+
+function createNewList(e){
   e.preventDefault();
-  createListContainer.removeChild(openCreateFormButton);
-  createListContainer.appendChild(createListForm);
-})
 
-// nevermindButton Functionality 
-nevermindButton.addEventListener('click', e => {
-  e.preventDefault();
-  createListContainer.removeChild(createListForm);
-  createListContainer.appendChild(openCreateFormButton);
-});
-
-// createListSumbit Functionality
-createListSubmit.addEventListener('click', e => {
-  e.preventDefault();
-
-  let newListName = listNameInput.value;
-
-  if(newListName.length === 0){
-    listNameInput.setAttribute('placeholder', 'Please Enter A List Name First');
-    listNameInput.style.borderBottom = '2px solid red';
-
+  //check if value exists
+  if(newListInput.value === '') {
+    newListLabel.innerText = 'Please Enter Task First';
+    newListLabel.style.color = 'red';
   } else {
-    listNameInput.style.borderBottom = '2px solid green';
-    //create Card
+    //create listCard
     const listCard = document.createElement('div');
     listCard.className = 'card';
 
-    //create cardTitle
+    //create cardContent Element
+    const cardContent = document.createElement('div');
+    cardContent.className = 'card-content';
+    //Append to listCard
+    listCard.appendChild(cardContent);
+
+    //create cardTitle Element
     const cardTitle = document.createElement('span');
-    cardTitle.className = 'card-title';
-    cardTitle.innerText = newListName;
-    listCard.appendChild(cardTitle);
+    cardTitle.className = 'card-title center';
+    cardTitle.innerText = `${newListInput.value}`;
+    //Append to cardContent
+    cardContent.appendChild(cardTitle);
 
+    //create AddToListItemButton
+    const addListItemButton = document.createElement('a');
+    addListItemButton.className = 'add-to-list-button left';
 
-    //Create collectionList
-    const collectionList = document.createElement('ul');
-    collectionList.className = 'collection';
-    listCard.appendChild(collectionList);
+    //create AddToListIcon
+    const addListItemIcon = document.createElement('i');
+    addListItemIcon.className = 'add-to-list-icon fa fa-plus';
+    //Appending to addListButton
+    addListItemButton.appendChild(addListItemIcon);
+    //Appending Button to Card
+    cardContent.appendChild(addListItemButton);
 
-    //Create firstItem
-    const firstItem = document.createElement('li');
-    firstItem.className = 'collection-item';
-    firstItem.innerHTML = `
-      <form class='task-form'>
-        <input type='text' name='task' id='task' placeholder='New Task...'></input>
-        <input type='submit' class='btn';><i class="fa fa-plus"></i>  
-      </form> 
-    `;
-    collectionList.appendChild(firstItem);
+    //create listSearchButton
+    const listSearchButton = document.createElement('a');
+    listSearchButton.className = 'filter-list-button';
+    cardContent.appendChild(listSearchButton);
 
-    let listDisplayContainer = document.querySelector('#listDisplayWrap');
+    //create listSearchIcon
+    const listSearchIcon = document.createElement('i');
+    listSearchIcon.className = 'filter-list-icon fas fa-search';
+    listSearchButton.appendChild(listSearchIcon)
+    
+    //create removeListButton
+    const removeListButton = document.createElement('a');
+    removeListButton.className = 'remove-list-button secondary-content';
+
+    //create removeListIcon
+    const removeListIcon = document.createElement('i');
+    removeListIcon.className = 'remove-list-icon fa fa-times';
+    removeListIcon.style.color = 'red';
+    //Appending to removeListButton
+    removeListButton.appendChild(removeListIcon);
+    //Appending Button to Card
+    cardContent.appendChild(removeListButton);
+    //Appending to listDisplayContainer
     listDisplayContainer.appendChild(listCard);
 
-    createListContainer.removeChild(createListForm);
-    createListContainer.appendChild(openCreateFormButton);
-    console.log(newListName);
-  }
-  
-
-
-});
-
-// const allListNames = JSON.parse(localStorage.getItem('listNames'));
-
-// allListNames.map(listName => {
-//   console.log(listName)
-// })
-
-// Creating a listDisplayContainer
-
-// const listDisplayContainer = document.querySelector('#listDisplayWrap');
-
-// const allListNames = JSON.parse(localStorage.getItem('listNames'));
-
-// allListNames.map(listName => {
-//   console.log(listName)
-// })
-
-// Appending listDisplayContainer to mainWrap
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const createListButton = document.querySelector('#createListButton');
-
-// createListButton.addEventListener('click', e => {
-//   e.preventDefault();
-
-//   const createForm = document.createElement('form');
-//   createForm.id = "create_form";
-
-
-//   const createInput = document.createElement('input');
-//   createInput.id = "new_task";
-//   createInput.setAttribute('type', 'text');
-//   createInput.className = "validate";
-//   createInput.setAttribute('placeholder', 'Enter New List Name Here...');
-
-//   const createButton = document.createElement('a');
-//   createButton.className = "waves-effect waves-light btn right green";
-//   createButton.innerText = "Create List";
-//   createButton.style.margin = '0px 10px';
-//   createButton.style.color = 'white';
-//   // createButton.style('color', 'white');
-
-//   const nevermindButton = document.createElement('a');
-//   nevermindButton.id = 'nevermindButton'
-//   nevermindButton.className = "waves-effect waves-light btn red right";
-//   nevermindButton.innerText = "Nevermind";
-
-//   createForm.appendChild(createInput);
-//   createForm.appendChild(createButton);
-//   createForm.appendChild(nevermindButton);
-  
-
-//   const createListWrap = document.querySelector('#createWrap');
-
-//   // createListWrap.remove(document.createListButton)
-
-//   if(createListWrap.children.length === 1){
-//     createListWrap.appendChild(createForm);
-//     createListWrap.removeChild(createListButton);
-//   }
-
-//   /* BUTTON EVENTS */
-
-//   //create button
-//   createButton.addEventListener('click', e => {
-
-//     e.preventDefault();
+    //create collection
+    const listCollection = document.createElement('ul');
+    listCollection.className = 'collection';
     
-//     const listName = document.querySelector('#new_task').value;
+    if(listCollection.children.length === 0) {
+      listCollection.style.display = 'none';
+    } else {
+      listCollection.style.display = 'block';
+    }
+    
+    listCard.appendChild(listCollection);
 
-//     let listNames;
+    //TODO
+    // //store in Local Storage
+    // storeListItems(taskInput.value);
 
-//     if(localStorage.getItem('listNames') === null){
-//       listNames = [];
-//     } else {
-//       listNames = JSON.parse(localStorage.getItem('listNames'))
-//     }
+    //Reset the input
+    if(newListInput.value.length > 0) {
+      newListLabel.innerText = 'New Task';
+      newListLabel.style.color = '#26a69a';
+      newListInput.value = '';
+    }
+  }
+}
 
-//     listNames.push(listName);
+function filterListNames(e){
+  e.preventDefault();
+  const filterListText = e.target.value.toLowerCase();
 
-//     localStorage.setItem('listNames', JSON.stringify(listNames));
+  document.querySelectorAll('.card').forEach(list => {
+    let listName = list.firstChild.textContent;
 
+    if(listName.toLowerCase().indexOf(filterListText) != -1){
+      list.style.display = 'block';
+    } else {
+      list.style.display = 'none';
+    }
+  });
+}
+
+function displayAddTaskInput(e) {
+  e.preventDefault();
+
+  let addLink = e.target;
+  let addLinkButton = e.target.parentElement;
+  let cardHeaderContent = e.target.parentElement.parentElement;
   
+  let searchLinkButton = e.target.parentElement.nextSibling;
 
+  if(e.target.classList.contains('add-to-list-icon') && e.target.parentElement.children.length === 1){
 
-//     // Setup button displaying list saved on timer.!!!!
+    let deleteListLink = e.target.parentElement.nextSibling.nextSibling;
+    
+    //create Task Form
+    let taskInputForm = document.createElement('form');
+    taskInputForm.className= 'create-task-form';
+    taskInputForm.setAttribute('action', 'submit');
+    
+    //create taskName input
+    let taskNameInput = document.createElement('input');
+    taskNameInput.setAttribute('placeHolder', 'Enter Task Name...');
+    taskNameInput.id = 'task-enter-input';
+    taskNameInput.style.width = '80%';
+    taskNameInput.style.height ='2rem';
 
-//   })
-
-//   //nevermind button
-//   nevermindButton.addEventListener('click', e => {
-//     createListWrap.removeChild(createForm);
-//     createListWrap.appendChild(createListButton);
-//   });
-
-
-// });
-
-// /* LIST DISPLAY */
-
-//   // - Creating a wrapper to hold all lists
-// const listDisplay = document.createElement('div');
-// listDisplay.id = 'listDisplayWrap';
-
-//   // - Appending to the body Element
-// document.querySelector('#mainWrap').appendChild(listDisplay);
-
-//   // - storing all listNames as an array
-// const allLists = JSON.parse(localStorage.getItem('listNames'));
+    //append to form
+    taskInputForm.appendChild(taskNameInput);
 
 
 
+    //Styling taskName input
+    cardHeaderContent.style.gridTemplateColumns = 'repeat(1, 3fr 1fr 2fr 1fr)';
+    addLink.style.display = 'inline-block';
+    addLinkButton.style.display = 'grid';
+    addLinkButton.style.gridTemplateColumns = 'repeat(1, 1fr 4fr)';
+    addLink.style.paddingLeft = '5px';
+    addLink.style.display = 'inline-block';
+    deleteListLink.style.gridColumn = '4/5';
+    searchLinkButton.style.gridColumn = '2/3';
+
+    addLinkButton.appendChild(taskInputForm);
+
+  } else if(e.target.classList.contains('add-to-list-icon') && e.target.parentElement.children.length > 1) {
+    e.target.nextSibling.remove();
+    let deleteListLink = e.target.parentElement.nextSibling.nextSibling;
+    cardHeaderContent.style.gridTemplateColumns = 'repeat(1, 1fr 1fr 3fr 1fr 1fr)';
+    deleteListLink.style.gridColumn = '5/6';
+    addLinkButton.style.gridTemplateColumns = 'none';
+
+  }
+}
+
+function filterTaskList(e){
+  e.preventDefault();
+
+  let searchLink = e.target;
+  let searchLinkButton = e.target.parentElement;
+  let cardHeaderContent = e.target.parentElement.parentElement;
+  let deleteListLink = e.target.parentElement.nextSibling;
+
+  if(e.target.classList.contains('filter-list-icon') && e.target.parentElement.children.length === 1){
+    //create filter input
+    let filterCurrentListInput = document.createElement('input');
+    filterCurrentListInput.className = 'list-filter-input';
+    filterCurrentListInput.setAttribute('placeHolder', 'Search Tasks');
+    filterCurrentListInput.style.width = '80%';
+    filterCurrentListInput.style.height ='2rem'
+    //Styling filter input
+    cardHeaderContent.style.gridTemplateColumns = 'repeat(1, 1fr 3fr 2fr 1fr)';
+    searchLink.style.display = 'inline-block';
+    searchLinkButton.style.display = 'grid';
+    searchLinkButton.style.gridTemplateColumns = 'repeat(1, 1fr 4fr)';
+    searchLink.style.paddingLeft = '5px';
+    searchLink.style.display = 'inline-block';
+    deleteListLink.style.gridColumn = '4/5';
+    searchLinkButton.appendChild(filterCurrentListInput);
+  } else if(e.target.classList.contains('filter-list-icon') && e.target.parentElement.children.length > 1) {
+    e.target.nextSibling.remove();
+    cardHeaderContent.style.gridTemplateColumns = 'repeat(1, 1fr 1fr 3fr 1fr 1fr)';
+    deleteListLink.style.gridColumn = '5/6';
+    searchLinkButton.style.gridTemplateColumns = 'none';
+  }
+}
+
+function removeList(e) {
+  e.preventDefault();
+  
+  if(e.target.classList.contains('remove-list-icon')){
+    if(confirm('Are you sure?')){
+      e.target.parentElement.parentElement.parentElement.remove();
+    }
+  } 
+}
+
+function addTaskToList(e) {
+  e.preventDefault();
+
+  let inputValue = e.target.firstChild.value;
+  let taskInput = e.target.firstChild;
 
 
+  console.log(taskInput);
+
+  if(inputValue=== '') {
+    console.log('empty')
+    taskInput.setAttribute('placeHolder', 'Please Enter Task First');
+    taskInput.style.borderBottom = '2px dashed red';
+  } else {
+    
+    let listCard = e.target.parentElement.parentElement.parentElement;
+    let listCollection = listCard.lastChild;
+    console.log(listCollection);
+
+    let listItem = document.createElement('li');
+    listItem.className = 'collection-item'
+    listItem.appendChild(document.createTextNode(inputValue));
+
+    let clearTaskLink = document.createElement('a');
+    clearTaskLink.className = 'delete-item secondary-content';
+    clearTaskLink.innerHTML = '<i class="far fa-check-circle"></i>';
+    clearTaskLink.style.color = 'green';
+
+    listItem.appendChild(clearTaskLink);
 
 
+    listCollection.appendChild(listItem);
 
+    if(listCollection.children.length > 0) {
+      listCollection.style.display = 'block';
+    }
 
+    taskInput.value = '';
+  }
+}
 
+function filterTaskNames(e){
+  e.preventDefault();
+  
+  if(e.target.classList.contains('list-filter-input')) {
+    let listCard = e.target.parentElement.parentElement.parentElement.lastChild;
+    let allListItems = Array.from(listCard.children);
+    let filterValue = e.target.value.toLowerCase();
+    console.log(allListItems);
 
+    allListItems.forEach((task) => {
+      let listText = task.firstChild.textContent;
 
+      if(listText.toLowerCase().indexOf(filterValue) != -1){
+        task.style.display = 'block';
+      } else {
+        task.style.display = 'none';
+      }
+    })
+  }
+}
 
+function removeTask(e) {
+  e.preventDefault();
+  const grandParent = e.target.parentElement.parentElement;
 
-
-
-
-
-
-
-// function displayLists() {
-//   // allLists.forEach(list => {
-//   let listCard = document.createElement('div');
-//   listCard.className = 'card listCard';
-//   let cardTitle = document.createElement('span');
-//   cardTitle.className = 'card-title';
-//   cardTitle.innerText = 
-//   listCard.appendChild(cardTitle);
-//   listDisplay.appendChild(listCard);
-//   // })
-// }
+  if(e.target.parentElement.classList.contains('delete-item')){
+    if(confirm('Are you sure?')){
+      e.target.parentElement.parentElement.remove();
+    }
+  }
+}
